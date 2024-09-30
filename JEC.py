@@ -9,7 +9,7 @@ def set_config() : # Block to configure plots
 
     config = {}
     config["eta"]   = [-0.4, 0.5]               # To produce the plot for fixed values of eta. Comment out to produce plots for all values of eta.
-    config["pt"]    = [9., 11.]                 # To produce the plot for fixed values of pt. Comment out to produce plots for all values of pt
+    config["pt"]    = [9., 10.]                 # To produce the plot for fixed values of pt. Comment out to produce plots for all values of pt
 
     config["outdir"] = "plot_Flavor/"           # Output directory name
     config["sources"] = {                       # JEC uncertainty sources. The numbers in brackers correspond to MarkerStyle and MarkerColor to format the histogram visuals
@@ -266,7 +266,6 @@ if __name__ == "__main__" :
                 hist = R.TH1F("h", "h", len(xarray)-1, xarray)
                 hist_name = "eta_{source}_pt_{pt}".format(source=quadname, pt=pt_bins[i])
                 for j in range(len(eta_bins)) :
-                    print(hist_name)
                     err = 0.
                     for source in config['quad'][quadname] :
                         err += type_dict[source]['err'][j][i]**2
@@ -323,9 +322,12 @@ if __name__ == "__main__" :
 ##############################
 ####### Plotting overlaid histograms vs eta
 
-    for pt in pt_bins :
-      if "pt" in config :
-        for ptvalue in config["pt"]:
+    if "pt" in config :
+      for ptvalue in config["pt"]:
+        if ptvalue not in pt_bins : 
+            print("Uncertainties not available for pt = {}. Try one of the following".format(ptvalue))
+            print(pt_bins)
+        for pt in pt_bins :
             if pt != ptvalue : continue
             c = R.TCanvas("c", "c", 800, 600)
             legdim = args.legdim
