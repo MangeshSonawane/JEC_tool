@@ -14,7 +14,7 @@ def set_config() : # Block to configure plots
     config["eta"]   = [0.0]               # To produce the plot for fixed values of eta. Comment out to produce plots for all values of eta.
     config["pt"]    = [123.5]                 # To produce the plot for fixed values of pt. Comment out to produce plots for all values of pt
 
-    config["outdir"] = "plot_{}_{}/".format(args.dirname, args.year)           # Output directory name
+    config["outdir"] = "plot_{}_{}/".format(args.output, args.year)           # Output directory name
     config["sources"] = {                       # JEC uncertainty sources. The numbers in brackers correspond to MarkerStyle and MarkerColor to format the histogram visuals
        "AbsoluteStat"     : [20, 1],
        "AbsoluteScale"    : [20, 2],
