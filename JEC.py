@@ -251,13 +251,6 @@ if __name__ == "__main__" :
         os.makedirs(config['outdir'])
 
 
-
-    # for name in config['sources'] :
-    #     etabin = 0
-    #     ptbin = 0
-    #     print(name, 100*type_dict[name]['err'][etabin][ptbin])
-
-
 ############################################################
 #### Individual TGraphs (vs pt) and histograms (vs eta) for each source in config['sources']
 
