@@ -11,10 +11,10 @@ R.gROOT.SetBatch(True)
 def set_config() : # Block to configure plots
 
     config = {}
-    config["eta"]   = [0.0]               # To produce the plot for fixed values of eta. Comment out to produce plots for all values of eta.
-    config["pt"]    = [123.5]                 # To produce the plot for fixed values of pt. Comment out to produce plots for all values of pt
+    # config["eta"]   = [0.0]               # To produce the plot for fixed values of eta. Comment out to produce plots for all values of eta.
+    # config["pt"]    = [123.5]                 # To produce the plot for fixed values of pt. Comment out to produce plots for all values of pt
 
-    config["outdir"] = "plot_{}_{}/".format(args.dirname, args.year)           # Output directory name
+    config["outdir"] = "plot_{}_{}/".format(args.output, args.year)           # Output directory name
     config["sources"] = {                       # JEC uncertainty sources. The numbers in brackers correspond to MarkerStyle and MarkerColor to format the histogram visuals
        "AbsoluteStat"     : [20, 1],
        "AbsoluteScale"    : [20, 2],
@@ -223,7 +223,7 @@ if __name__ == "__main__" :
         values = split_line(line)
         type_dict[tempname]["eta"].append([values[0], values[1]])
         type_dict[tempname]["pt"].append(values[3::3])
-        type_dict[tempname]["err"].append(values[4::3])
+        type_dict[tempname]["err"].append([abs(v) for v in values[4::3]]) # use absolute values
 
 #############################################
 ## Definitions useful for binning
@@ -249,6 +249,14 @@ if __name__ == "__main__" :
 
     if not os.path.exists(config['outdir']):
         os.makedirs(config['outdir'])
+
+
+
+    # for name in config['sources'] :
+    #     etabin = 0
+    #     ptbin = 0
+    #     print(name, 100*type_dict[name]['err'][etabin][ptbin])
+
 
 ############################################################
 #### Individual TGraphs (vs pt) and histograms (vs eta) for each source in config['sources']
@@ -292,7 +300,6 @@ if __name__ == "__main__" :
                 for source in config['quad'][quadname] :
                     yarray_temp = np.array(type_dict[source]['err'][i], 'd')**2
                     yarray = yarray + yarray_temp
-
                 yarray = np.sqrt(yarray)
                 graphname = "pt_{source}_etabin_{val1}_{val2}".format(source=quadname, val1 = eta_bins[i][0], val2 = eta_bins[i][1])
                 xarray = np.array(pt_bins, 'd')
@@ -331,11 +338,11 @@ if __name__ == "__main__" :
     if "eta" in config :
         for etavalue in config["eta"] :
             for etabin in eta_bins :
-                if etavalue >= etabin[0] and etavalue < etabin[1] : 
-                    if etabin not in eta_bins_run : eta_bins_run.append(etabin) 
+                if etavalue >= etabin[0] and etavalue < etabin[1] :
+                    if etabin not in eta_bins_run : eta_bins_run.append(etabin)
 
     else : eta_bins_run = eta_bins
-        
+
     for etabin in eta_bins_run :
        c = R.TCanvas("c", "c", 800, 600)
        legdim = args.legdim
@@ -346,7 +353,7 @@ if __name__ == "__main__" :
            if eta_range in graphname :
                namelist = graphname.split("_")
                leg.AddEntry(graphs[graphname], namelist[1])
-               if firstplot is True : 
+               if firstplot is True :
                    graphs[graphname].GetYaxis().SetTitle("JEC uncertainty [%]")
                    graphs[graphname].GetXaxis().SetTitle("p_{T} [GeV]")
                    graphs[graphname].Draw()
@@ -354,7 +361,7 @@ if __name__ == "__main__" :
                    graphs[graphname].SetMaximum(args.ymax)
                    graphs[graphname].SetTitle("")
                    firstplot = False
-               else : 
+               else :
                    graphs[graphname].Draw("pl same")
 
        leg.SetLineWidth(0)
@@ -375,9 +382,9 @@ if __name__ == "__main__" :
 ####### Plotting overlaid histograms vs eta
 
     pt_bins_run = []
-    if "pt" in config : 
+    if "pt" in config :
         for ptvalue in config["pt"]:
-            if ptvalue not in pt_bins : 
+            if ptvalue not in pt_bins :
                 print("Uncertainties not available for pt = {}. Try one of the following".format(ptvalue))
                 print(pt_bins)
             else : pt_bins_run.append(ptvalue)
@@ -393,7 +400,7 @@ if __name__ == "__main__" :
           if pt_str in histname :
               namelist = histname.split("_")
               leg.AddEntry(hists[histname], namelist[1])
-              if firstplot is True : 
+              if firstplot is True :
                   hists[histname].GetYaxis().SetTitle("JEC uncertainty [%]")
                   hists[histname].GetXaxis().SetTitle("#eta")
                   hists[histname].Draw("pl")
@@ -401,7 +408,7 @@ if __name__ == "__main__" :
                   hists[histname].SetMaximum(args.ymax)
                   hists[histname].SetTitle("")
                   firstplot = False
-              else : 
+              else :
                   hists[histname].Draw("pl same")
 
       leg.SetLineWidth(0)
