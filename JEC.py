@@ -2,6 +2,9 @@ import ROOT as R
 import numpy as np
 import argparse
 import os
+import string
+import random
+
 
 R.gROOT.SetBatch(True)
 
@@ -9,7 +12,7 @@ def set_config() : # Block to configure plots
 
     config = {}
     config["eta"]   = [0.0]               # To produce the plot for fixed values of eta. Comment out to produce plots for all values of eta.
-    config["pt"]    = [9., 10.]                 # To produce the plot for fixed values of pt. Comment out to produce plots for all values of pt
+    config["pt"]    = [123.5]                 # To produce the plot for fixed values of pt. Comment out to produce plots for all values of pt
 
     config["outdir"] = "plot_Flavor_"+args.year+"/"           # Output directory name
     config["sources"] = {                       # JEC uncertainty sources. The numbers in brackers correspond to MarkerStyle and MarkerColor to format the histogram visuals
@@ -266,7 +269,8 @@ if __name__ == "__main__" :
         for i in range(len(pt_bins)) :      ## Looping over each pt value
             hist_name = "eta_{source}_pt_{pt}".format(source=name, pt=pt_bins[i])
             xarray = np.array(eta_edges, 'd')
-            hist = R.TH1F("h", "h", len(xarray)-1, xarray)
+            randomString = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+            hist = R.TH1F("h_"+randomString, "h", len(xarray)-1, xarray)
             for j in range(len(eta_bins)) : # Here we loop over each eta bin and set the content of each bin to be the uncertainty value
                 hist.SetBinContent(j+1, type_dict[name]['err'][j][i]*100.)
             hist.SetStats(0)
@@ -303,7 +307,8 @@ if __name__ == "__main__" :
             linecol = 2
             xarray = np.array(eta_edges, 'd')
             for quadname in config['quad'] :
-                hist = R.TH1F("h", "h", len(xarray)-1, xarray)
+                randomString = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+                hist = R.TH1F("h_"+randomString, "h", len(xarray)-1, xarray)
                 hist_name = "eta_{source}_pt_{pt}".format(source=quadname, pt=pt_bins[i])
                 for j in range(len(eta_bins)) :
                     err = 0.
