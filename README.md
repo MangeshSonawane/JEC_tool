@@ -3,7 +3,7 @@ Tool to debug the splitting of JEC uncertainties.
 
 The code reads in the input text file, and first parses it to bin the JEC uncertainties according to eta and pt bins. This is done for all JEC sources. Then it plots the uncertainties for each JEC source as a function of pt for each eta bin, and as a function of eta for each pt bin.
 
-## Usage 
+## Usage
 
 ```
 python JEC.py <options>
@@ -17,6 +17,7 @@ The scripts supports command line options as follow :
 - --logx : Set x axis to log. Disabled by default. Only possible for the pt distribution.
 - --logy : Set y axis to log. Disabled by default.
 - --legdim x1 y1 x2 y2: Customize the legend position and size. Default is [0.5, 0.5, 0.9, 0.88]
+- --year str : Selects the year file UL2016preVFP/UL2016/UL2017/UL2018. Default = UL2018.
 
 ## Config section
 
