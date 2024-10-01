@@ -18,6 +18,7 @@ The scripts supports command line options as follow :
 - --logy : Set y axis to log. Disabled by default.
 - --legdim x1 y1 x2 y2: Customize the legend position and size. Default is [0.5, 0.5, 0.9, 0.88]
 - --year str : Selects the year file UL2016preVFP/UL2016/UL2017/UL2018. Default = UL2018.
+- --output str : Sets name for the output directory "plots_<output>_<year>/. Default = output.
 
 ## Config section
 

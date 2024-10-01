@@ -14,7 +14,7 @@ def set_config() : # Block to configure plots
     config["eta"]   = [0.0]               # To produce the plot for fixed values of eta. Comment out to produce plots for all values of eta.
     config["pt"]    = [123.5]                 # To produce the plot for fixed values of pt. Comment out to produce plots for all values of pt
 
-    config["outdir"] = "plot_Flavor_"+args.year+"/"           # Output directory name
+    config["outdir"] = "plot_{}_{}/".format(args.dirname, args.year)           # Output directory name
     config["sources"] = {                       # JEC uncertainty sources. The numbers in brackers correspond to MarkerStyle and MarkerColor to format the histogram visuals
        "AbsoluteStat"     : [20, 1],
        "AbsoluteScale"    : [20, 2],
@@ -166,7 +166,8 @@ parser.add_argument("--ymin", type = float, default = 0., help = "y axis min")
 parser.add_argument("--logx", action = "store_true", default=False, help = "Set log x axis")
 parser.add_argument("--logy", action = "store_true", default=False, help = "Set log y axis")
 parser.add_argument("--legdim", nargs = 4, type = float, default = [0.5, 0.5, 0.9, 0.88], help = "legend dimensions")
-parser.add_argument("--year", type = str, default = "UL2018", help = "year = UL2016preVFP/UL2016/UL2017/UL2018")
+parser.add_argument("--year", type = str, default = "UL2018", help = "--year = UL2016preVFP/UL2016/UL2017/UL2018")
+parser.add_argument("--output", type = str, default = "output", help = "--output Flavour")
 
 args = parser.parse_args()
 
@@ -326,82 +327,91 @@ if __name__ == "__main__" :
 ###############################
 ############### Plotting overlaid histograms vs pt
 
-    for etabin in eta_bins :
-        if "eta" in config :
-          for etavalue in config["eta"] :
-            if etavalue < etabin[0] or etavalue > etabin[1] : continue
-            c = R.TCanvas("c", "c", 800, 600)
-            legdim = args.legdim
-            leg = R.TLegend(legdim[0], legdim[1], legdim[2], legdim[3])
-            firstplot = True
-            for graphname in graphs :
-                eta_range = "{}_{}".format(etabin[0], etabin[1])
-                if eta_range in graphname :
-                    namelist = graphname.split("_")
-                    leg.AddEntry(graphs[graphname], namelist[1])
-                    if firstplot is True :
-                        graphs[graphname].GetYaxis().SetTitle("JEC uncertainty [%]")
-                        graphs[graphname].GetXaxis().SetTitle("p_{T} [GeV]")
-                        graphs[graphname].Draw()
-                        graphs[graphname].SetMinimum(args.ymin)
-                        graphs[graphname].SetMaximum(args.ymax)
-                        graphs[graphname].SetTitle("")
-                        firstplot = False
-                    else :
-                        graphs[graphname].Draw("pl same")
+    eta_bins_run = []
+    if "eta" in config :
+        for etavalue in config["eta"] :
+            for etabin in eta_bins :
+                if etavalue >= etabin[0] and etavalue < etabin[1] : 
+                    if etabin not in eta_bins_run : eta_bins_run.append(etabin) 
 
-            leg.SetLineWidth(0)
-            leg.Draw("same")
-            if args.logx : c.SetLogx()
-            if args.logy : c.SetLogy()
-            latex = R.TLatex(15, 16, "{} < #eta < {}".format(etabin[0], etabin[1]))
-            if "eta" in config : latex = R.TLatex(15, 16, "#eta = {}".format(etavalue))
-            latex.SetTextSize(0.04)
-            latex.Draw()
-            c.Update()
-            plotname = "pt_etabin_{}_{}".format(etabin[0], etabin[1])
-            c.SaveAs("{}{}.root".format(config["outdir"], plotname))
-            c.SaveAs("{}{}.png".format(config["outdir"], plotname))
-            c.SaveAs("{}{}.pdf".format(config["outdir"], plotname))
+    else : eta_bins_run = eta_bins
+        
+    for etabin in eta_bins_run :
+       c = R.TCanvas("c", "c", 800, 600)
+       legdim = args.legdim
+       leg = R.TLegend(legdim[0], legdim[1], legdim[2], legdim[3])
+       firstplot = True
+       for graphname in graphs :
+           eta_range = "{}_{}".format(etabin[0], etabin[1])
+           if eta_range in graphname :
+               namelist = graphname.split("_")
+               leg.AddEntry(graphs[graphname], namelist[1])
+               if firstplot is True : 
+                   graphs[graphname].GetYaxis().SetTitle("JEC uncertainty [%]")
+                   graphs[graphname].GetXaxis().SetTitle("p_{T} [GeV]")
+                   graphs[graphname].Draw()
+                   graphs[graphname].SetMinimum(args.ymin)
+                   graphs[graphname].SetMaximum(args.ymax)
+                   graphs[graphname].SetTitle("")
+                   firstplot = False
+               else : 
+                   graphs[graphname].Draw("pl same")
+
+       leg.SetLineWidth(0)
+       leg.Draw("same")
+       if args.logx : c.SetLogx()
+       if args.logy : c.SetLogy()
+       latex = R.TLatex(15, 16, "{} < #eta < {}".format(etabin[0], etabin[1]))
+       if "eta" in config : latex = R.TLatex(15, 16, "#eta = {}".format(etavalue))
+       latex.SetTextSize(0.04)
+       latex.Draw()
+       c.Update()
+       plotname = "pt_etabin_{}_{}".format(etabin[0], etabin[1])
+       c.SaveAs("{}{}.root".format(config["outdir"], plotname))
+       c.SaveAs("{}{}.png".format(config["outdir"], plotname))
+       c.SaveAs("{}{}.pdf".format(config["outdir"], plotname))
 
 ##############################
 ####### Plotting overlaid histograms vs eta
 
-    if "pt" in config :
-      for ptvalue in config["pt"]:
-        if ptvalue not in pt_bins :
-            print("Uncertainties not available for pt = {}. Try one of the following".format(ptvalue))
-            print(pt_bins)
-        for pt in pt_bins :
-            if pt != ptvalue : continue
-            c = R.TCanvas("c", "c", 800, 600)
-            legdim = args.legdim
-            leg = R.TLegend(legdim[0], legdim[1], legdim[2], legdim[3])
-            firstplot = True
-            for histname in hists :
-                pt_str = "pt_{}".format(pt)
-                if pt_str in histname :
-                    namelist = histname.split("_")
-                    leg.AddEntry(hists[histname], namelist[1])
-                    if firstplot is True :
-                        hists[histname].GetYaxis().SetTitle("JEC uncertainty [%]")
-                        hists[histname].GetXaxis().SetTitle("#eta")
-                        hists[histname].Draw("pl")
-                        hists[histname].SetMinimum(args.ymin)
-                        hists[histname].SetMaximum(args.ymax)
-                        hists[histname].SetTitle("")
-                        firstplot = False
-                    else :
-                        hists[histname].Draw("pl same")
+    pt_bins_run = []
+    if "pt" in config : 
+        for ptvalue in config["pt"]:
+            if ptvalue not in pt_bins : 
+                print("Uncertainties not available for pt = {}. Try one of the following".format(ptvalue))
+                print(pt_bins)
+            else : pt_bins_run.append(ptvalue)
 
-            leg.SetLineWidth(0)
-            leg.Draw("same")
-            if args.logy : c.SetLogy()
-            latex = R.TLatex(-4.5, 18, "p_{{T}} = {}".format(ptvalue))
-            latex.SetTextSize(0.04)
-            latex.Draw()
-            c.Update()
-            plotname = "eta_pt_{}".format(pt)
-            c.SaveAs("{}{}.root".format(config["outdir"], plotname))
-            c.SaveAs("{}{}.png".format(config["outdir"], plotname))
-            c.SaveAs("{}{}.pdf".format(config["outdir"], plotname))
+    else : pt_bins_run = pt_bins
+    for pt in pt_bins_run :
+      c = R.TCanvas("c", "c", 800, 600)
+      legdim = args.legdim
+      leg = R.TLegend(legdim[0], legdim[1], legdim[2], legdim[3])
+      firstplot = True
+      for histname in hists :
+          pt_str = "pt_{}".format(pt)
+          if pt_str in histname :
+              namelist = histname.split("_")
+              leg.AddEntry(hists[histname], namelist[1])
+              if firstplot is True : 
+                  hists[histname].GetYaxis().SetTitle("JEC uncertainty [%]")
+                  hists[histname].GetXaxis().SetTitle("#eta")
+                  hists[histname].Draw("pl")
+                  hists[histname].SetMinimum(args.ymin)
+                  hists[histname].SetMaximum(args.ymax)
+                  hists[histname].SetTitle("")
+                  firstplot = False
+              else : 
+                  hists[histname].Draw("pl same")
+
+      leg.SetLineWidth(0)
+      leg.Draw("same")
+      if args.logy : c.SetLogy()
+      latex = R.TLatex(-4.5, 18, "p_{{T}} = {}".format(pt))
+      latex.SetTextSize(0.04)
+      latex.Draw()
+      c.Update()
+      plotname = "eta_pt_{}".format(pt)
+      c.SaveAs("{}{}.root".format(config["outdir"], plotname))
+      c.SaveAs("{}{}.png".format(config["outdir"], plotname))
+      c.SaveAs("{}{}.pdf".format(config["outdir"], plotname))
