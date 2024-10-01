@@ -11,8 +11,8 @@ R.gROOT.SetBatch(True)
 def set_config() : # Block to configure plots
 
     config = {}
-    # config["eta"]   = [0.0]               # To produce the plot for fixed values of eta. Comment out to produce plots for all values of eta.
-    # config["pt"]    = [123.5]                 # To produce the plot for fixed values of pt. Comment out to produce plots for all values of pt
+    config["eta"]   = [0.0]               # To produce the plot for fixed values of eta. Comment out to produce plots for all values of eta.
+    config["pt"]    = [123.5]                 # To produce the plot for fixed values of pt. Comment out to produce plots for all values of pt
 
     config["outdir"] = "plot_{}_{}/".format(args.output, args.year)           # Output directory name
     config["sources"] = {                       # JEC uncertainty sources. The numbers in brackers correspond to MarkerStyle and MarkerColor to format the histogram visuals
@@ -361,7 +361,7 @@ if __name__ == "__main__" :
        leg.Draw("same")
        if args.logx : c.SetLogx()
        if args.logy : c.SetLogy()
-       latex = R.TLatex(15, 16, "{} < #eta < {}".format(etabin[0], etabin[1]))
+       latex = R.TLatex(15, args.ymax*(0.9), "{} < #eta < {}".format(etabin[0], etabin[1]))
        if "eta" in config : latex = R.TLatex(15, 16, "#eta = {}".format(etavalue))
        latex.SetTextSize(0.04)
        latex.Draw()
@@ -407,7 +407,7 @@ if __name__ == "__main__" :
       leg.SetLineWidth(0)
       leg.Draw("same")
       if args.logy : c.SetLogy()
-      latex = R.TLatex(-4.5, 18, "p_{{T}} = {}".format(pt))
+      latex = R.TLatex(-4.5, args.ymax*0.9, "p_{{T}} = {}".format(pt))
       latex.SetTextSize(0.04)
       latex.Draw()
       c.Update()
